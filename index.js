@@ -124,7 +124,7 @@ function getContractArguments(callback) {
         },
         {
             name: 'contractAbi',
-            type: 'editor',
+            type: 'input',
             message: 'Enter the ABI of the contract that you want to listen to:',
             validate: function (value) {
                 if (value.length) {

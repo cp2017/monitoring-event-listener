@@ -1,0 +1,16 @@
+pipeline:
+  build:
+    image: node:6.9.2
+    commands:
+      - npm install
+      - apt-get update
+      - apt-get install -y expect
+      - ./monitor.expect
+services:
+  geth:
+    image: cp2017/geth:2017-01-25
+    pull: true
+    container_name: geth
+    environment:
+     - GETH_TEST_DATABASE=false
+     - GETH_BOOTSTRAP=true
