@@ -6,6 +6,13 @@ pipeline:
       - apt-get update
       - apt-get install -y expect
       - ./monitor.expect
+  slack:
+    image: plugins/slack
+    channel: drone
+    username: drone
+    when:
+      status: [ success, failure ]
+
 services:
   geth:
     image: cp2017/geth:2017-01-25
