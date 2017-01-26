@@ -4,7 +4,7 @@
 Libraries
  */
 var chalk = require('chalk');
-var clear = require('clear');
+//var clear = require('clear');
 var figlet = require('figlet');
 var inquirer = require('inquirer');
 var Web3 = require('web3');
@@ -23,7 +23,7 @@ var event;
 /********************************************************************
  1. Print headline
  *******************************************************************/
-clear();
+//clear();
 console.log(
     chalk.blue(
         figlet.textSync('Ethereum listener', {horizontalLayout: 'full'})
@@ -124,7 +124,7 @@ function getContractArguments(callback) {
         },
         {
             name: 'contractAbi',
-            type: 'editor',
+            type: 'input',
             message: 'Enter the ABI of the contract that you want to listen to:',
             validate: function (value) {
                 if (value.length) {

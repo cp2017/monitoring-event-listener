@@ -1,4 +1,5 @@
 # Ethereum contract event listener
+[![Build Status](http://ec2-54-194-144-141.eu-west-1.compute.amazonaws.com/api/badges/cp2017/monitoring-event-listener/status.svg)](http://ec2-54-194-144-141.eu-west-1.compute.amazonaws.com/cp2017/monitoring-event-listener)
 This NPM module can subscribe to events that are fired by contracts in the Ethereum blockchain. At this
 time the module can only be used as a CLI tool.
 
@@ -8,7 +9,7 @@ At the moment there are two possibilities to run the CLI tool.
 https://www.npmjs.com/package/ethereum-listener
 
 ### 1. Run the script locally
-First download the project from Github and navigate to the project directory. 
+First download the project from Github and navigate to the project directory.
 Then simply run:
 
 `$ node index.js`
@@ -29,11 +30,11 @@ for the contract abi. The last thing you need to provide is the name of the even
 
 ```
   _____   _     _                                                  _   _         _                                
- | ____| | |_  | |__     ___   _ __    ___   _   _   _ __ ___     | | (_)  ___  | |_    ___   _ __     ___   _ __ 
+ | ____| | |_  | |__     ___   _ __    ___   _   _   _ __ ___     | | (_)  ___  | |_    ___   _ __     ___   _ __
  |  _|   | __| | '_ \   / _ \ | '__|  / _ \ | | | | | '_ ` _ \    | | | | / __| | __|  / _ \ | '_ \   / _ \ | '__|
  | |___  | |_  | | | | |  __/ | |    |  __/ | |_| | | | | | | |   | | | | \__ \ | |_  |  __/ | | | | |  __/ | |   
  |_____|  \__| |_| |_|  \___| |_|     \___|  \__,_| |_| |_| |_|   |_| |_| |___/  \__|  \___| |_| |_|  \___| |_|   
-                                                                                                                                                                                                                       
+
 ? Enter your ethereum client address: http://localhost:8545
 ? Enter your ethereum user password: ***
 ? Enter the address of the contract that you want to listen to: 0x593d12e2676e50b0254346f1bac6ff1257323706

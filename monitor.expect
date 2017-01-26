@@ -1,0 +1,24 @@
+#!/usr/bin/expect -f
+set timeout -1
+
+spawn node index.js
+match_max 100000
+# Look for passwod prompt
+expect "*?ethereum client address:*"
+# Send password aka $password
+send -- "http://localhost:8545\r"
+# send blank line (\r) to make sure we get back to gui
+send -- "\r"
+expect "*?Enter your ethereum user password:*"
+send -- "pw0\r"
+send -- "\r"
+expect "*?Enter the address of the contract that you want to listen to:*"
+send -- "0x337dbcfaa7eb376ae8ac0d6eb8c5f2d5c5133478\r"
+send -- "\r"
+expect "*?ABI of the contract that you want to listen to:*"
+send -- "Received\r"
+send -- "\r"
+expect "*?the event that you want to subscribe to:*"
+send -- "newMonitorRecord\r"
+send -- "\r"
+expect eof
