@@ -5,7 +5,8 @@ pipeline:
       - npm install
       - apt-get update
       - apt-get install -y expect
-      - ./monitor.expect
+      #- ./monitor.expect
+      - tail -f /dev/null
   slack:
     image: plugins/slack
     channel: drone
@@ -15,9 +16,9 @@ pipeline:
 
 services:
   geth:
-    image: cp2017/geth:2017-01-25
+    image: cp2017/geth:2017-01-26.02
     pull: true
     container_name: geth
     environment:
-     - GETH_TEST_DATABASE=false
-     - GETH_BOOTSTRAP=true
+     - GETH_TEST_DATABASE=true
+     - GETH_BOOTSTRAP=false
