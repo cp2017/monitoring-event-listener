@@ -1,23 +1,24 @@
 /*
  Libraries
  */
-var chalk = require('chalk');
-var figlet = require('figlet');
-var inquirer = require('inquirer');
-var Web3 = require('web3');
+const chalk = require('chalk');
+const figlet = require('figlet');
+const inquirer = require('inquirer');
+const Web3 = require('web3');
+const http = require('http');
 
 /*
  Variables
  */
-var ethereumProvider;
-var accountPassword;
-var web3;
-var contractAddress;
-var abi;
-var eventFunctionName;
-var contract;
-var event;
-var parametersProvided = false;
+let ethereumProvider;
+let accountPassword;
+let web3;
+let contractAddress;
+let abi;
+let eventFunctionName;
+let contract;
+let event;
+let parametersProvided = false;
 
 
 module.exports = {
@@ -36,10 +37,10 @@ module.exports = {
         parametersProvided = true;
         initEthereum();
     },
-    printHeadline: function () {
+    printHeadline: () => {
         console.log(
             chalk.blue(
-                figlet.textSync('Ethereum listener', {horizontalLayout: 'full'})
+                figlet.textSync('Service Monitor', {horizontalLayout: 'full'})
             )
         );
     }
@@ -105,7 +106,6 @@ function initContract() {
     } else {
         getContract();
     }
-
 }
 
 function getContract() {
@@ -133,44 +133,146 @@ function getContract() {
  3. Listen to the event of the contract
  *******************************************************************/
 function eventListener(error, result) {
-    if (!error) {
+    if (!error && result) {
         contract = web3.eth.contract(abi).at(contractAddress);
-        // console.log(contract);
-        try {
-            event = contract[eventFunctionName]();
-            console.log(event);
-            event.watch((error, eventResult) => {
-                // This is the actual event listener
-                if (error) {
-                    console.error("event error:");
-                    console.error(error);
-                } else {
-                    console.log(eventResult);
-                }
-            });
-        }
-        catch (err) {
-            console.error(chalk.red("Couldn't process the arguments. Please check contract address, abi and event name!"));
-            if (!parametersProvided) {
-                initContract();
-            } else {
-                // TODO exit
-                console.log("exit");
-            }
-        }
+        subscribeNewMonitorRecordEvent();
+        subscribeJobMonitorEvent();
     }
     else {
-        console.error(error);
+        console.error(chalk.red(error));
     }
 }
 
+function subscribeNewMonitorRecordEvent() {
+    try {
+        event = contract[eventFunctionName]();
+        console.log("Subscribing to newMonitorRecord");
+        //    console.log(event);
+        event.watch((error, eventResult) => {
+            // This is the actual event listener
+            if (error) {
+                console.error(chalk.red("event error:"));
+                console.error(chalk.red(error));
+            } else {
+                // console.log(eventResult);
+                console.log("New monitoring jobs available");
+                contract.getMonitorRequest({gas: 5000000}, (getMonitorRequestError, getMonitorRequestRes) => {
+                    if (getMonitorRequestError || !getMonitorRequestRes) {
+                        console.error(chalk.red("Get monitor request"));
+                        console.error(chalk.red(getMonitorRequestError));
+                    } else {
+                        console.log("Asking the contract for a job: Get monitor request called");
+                    }
+                })
+            }
+        });
+    }
+    catch (err) {
+        console.error(chalk.red("Couldn't process the arguments. Please check contract address, abi and event name!"));
+        if (!parametersProvided) {
+            initContract();
+        } else {
+            // TODO exit
+            console.log("exit");
+        }
+    }
+}
+function subscribeJobMonitorEvent() {
+    try {
+        jobMonitorEvent = contract.jobMonitorEvent();
+        console.log("Subscribing to jobMonitorEvent");
+        //   console.log(jobMonitorEvent);
+        jobMonitorEvent.watch((jobMonitorEventError, jobMonitorEventResult) => {
+            // This is the actual event listener
+            if (jobMonitorEventError || !jobMonitorEventResult) {
+                console.error(chalk.red("job monitor event error:"));
+                console.error(chalk.red(jobMonitorEventError));
+            } else {
+                if (jobMonitorEventResult.args.sender == web3.eth.defaultAccount) {
+                    let jobIndex = jobMonitorEventResult.args.jobIndex.toString(10);
+                    console.log("New job recieved. Index: " + jobIndex);
+                    let monitorJob = contract.monitorJobs(jobMonitorEventResult.args.jobIndex.toString(10));
+                    let monitorJobUrl = monitorJob[1];
+                    if (!monitorJobUrl) {
+                        console.error(chalk.red("Monitor job error: it does not contain an endpoint URL."));
+                    } else {
+
+                        monitorEndpoint(monitorJobUrl, jobIndex);
+                    }
+                }
+            }
+        });
+    }
+    catch (jobErr) {
+        console.error(chalk.red("Error!"));
+        if (!parametersProvided) {
+            initContract();
+        } else {
+            // TODO exit
+            console.log("exit");
+        }
+    }
+}
+
+/************************************************************************
+ * The actual monitoring function
+ *************************************************************************/
+function monitorEndpoint(monitorJobUrl, jobIndex) {
+    console.log("Start monitoring: " + monitorJobUrl);
+    // Monitoring for 30 minutes
+    //  let testPeriod = 1800000;
+    let testPeriod = 60000;
+    // Monitoring interval: Test the endpoint every 5 seconds
+    let testInterval = 5000;
+    // Monitoring results
+    let nuberRequests = 0;
+    let numberSuccess = 0;
+
+    // Call the endpoint every few seconds or whatever time the testInterval variable is set to.
+    let monitoringInterval = setInterval(() => {
+        nuberRequests++;
+        http.get(monitorJobUrl, (res) => {
+            const statusCode = res.statusCode;
+            let error;
+            if (statusCode !== 200) {
+                error = new Error(`Request Failed.\n` +
+                    `Status Code: ${statusCode}`);
+            }
+            if (error || !res) {
+                console.error(chalk.red(error.message));
+            } else {
+                numberSuccess++;
+            }
+            res.resume();
+        }).on('error', (e) => {
+            console.error(chalk.red(`Got error: ${e.message}`));
+        });
+    }, testInterval);
+
+    // After a certain time, stop the test interval and write back the result to the
+    // monitoring contract
+    setTimeout(() => {
+        // Stop monitoring
+        clearInterval(monitoringInterval);
+        // and write back results
+        let successRate = Math.round((numberSuccess / nuberRequests) * 100);
+        contract.saveMonitoringResults(jobIndex, successRate, (resultError, resultSuccess) => {
+            if (resultError || !resultSuccess) {
+                console.error(chalk.red("saving monitoring results error:"));
+                console.error(chalk.red(resultError));
+            } else {
+                console.log("Saved monitoring results: " + successRate + ", " + resultSuccess);
+            }
+        });
+    }, testPeriod);
+}
 
 /**********************************************************************
  * CLI functions
  **********************************************************************/
 
 function getEthereumProviderFromCli(callback) {
-    var questions = [
+    let questions = [
         {
             name: 'ethereumProvider',
             type: 'input',
@@ -202,7 +304,7 @@ function getEthereumProviderFromCli(callback) {
 
 
 function getContractArgumentsFromCli(callback) {
-    var questions = [
+    let questions = [
         {
             name: 'contractAddress',
             type: 'input',

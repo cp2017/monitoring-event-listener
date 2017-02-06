@@ -42,6 +42,7 @@ Here is an example how you can provide the information as arguments when startin
 `$ ethereum-listener  --ethereumProvider="http://localhost:8545" --password="pw0" --contractAddress="7596bcd41d32d170c572349c47d6c3f78004dbd6" --eventName="newMonitorRecord" --contractAbi=contract-abi`
 
 Be aware that the `--contractAbi` parameter needs to get the address to a file in your file system (which contains the abi) instead of the ABI itself. 
+Also make sure that you remove the prefix 0x of the contract address. 
 
 #### 2.a Use interactive CLI
 The usage of this script is self explaining. Start the script by `$ ethereum-listener`. It will ask you for the address of your ethereum client and the
