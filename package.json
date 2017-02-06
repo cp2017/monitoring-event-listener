@@ -1,13 +1,13 @@
 {
-  "name": "ethereum-listener",
-  "version": "0.0.1",
-  "description": "This little npm module subscribes to the event of a contract in the ethereum blockchain and prints out the information.",
+  "name": "cp2017-service-monitor",
+  "version": "0.0.2",
+  "description": "This little npm module subscribes to the monitor events of the service marketplace and starts monitoring the endpoint. After finishing, it writes back the result to the blockchain.",
   "main": "index.js",
   "scripts": {
     "test": "test"
   },
   "bin": {
-    "ethereum-listener": "./index.js"
+    "cp2017-service-monitor": "./index.js"
   },
   "repository": {
     "type": "git",
@@ -28,9 +28,9 @@
   "homepage": "https://github.com/cp2017/monitoring-event-listener#readme",
   "dependencies": {
     "chalk": "^1.1.3",
-    "clear": "0.0.1",
     "figlet": "^1.2.0",
     "inquirer": "^3.0.1",
-    "web3": "0.17.0-beta"
+    "web3": "0.17.0-beta",
+    "yargs": "^6.6.0"
   }
 }
