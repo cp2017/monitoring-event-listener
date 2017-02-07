@@ -162,6 +162,7 @@ function subscribeNewMonitorRecordEvent() {
                         console.error(chalk.red(getMonitorRequestError));
                     } else {
                         console.log("Asking the contract for a job: Get monitor request called");
+                        console.log("Transaction hash: " + getMonitorRequestRes)
                     }
                 })
             }
