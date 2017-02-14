@@ -162,6 +162,7 @@ function subscribeNewMonitorRecordEvent() {
                         console.error(chalk.red(getMonitorRequestError));
                     } else {
                         console.log("Asking the contract for a job: Get monitor request called");
+                        console.log("Transaction hash: " + getMonitorRequestRes)
                     }
                 })
             }
@@ -196,8 +197,7 @@ function subscribeJobMonitorEvent() {
                     if (!monitorJobUrl) {
                         console.error(chalk.red("Monitor job error: it does not contain an endpoint URL."));
                     } else {
-
-                        monitorEndpoint(monitorJobUrl, jobIndex);
+                        monitorEndpoint(monitorJobUrl + "/monitor", jobIndex);
                     }
                 }
             }
