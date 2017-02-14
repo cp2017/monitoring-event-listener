@@ -197,8 +197,7 @@ function subscribeJobMonitorEvent() {
                     if (!monitorJobUrl) {
                         console.error(chalk.red("Monitor job error: it does not contain an endpoint URL."));
                     } else {
-
-                        monitorEndpoint(monitorJobUrl, jobIndex);
+                        monitorEndpoint(monitorJobUrl + "/monitor", jobIndex);
                     }
                 }
             }
