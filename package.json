@@ -1,11 +1,7 @@
 {
   "name": "cp2017-service-monitor",
-  "version": "0.0.2",
-  "description": "This little npm module subscribes to the monitor events of the service marketplace and starts monitoring the endpoint. After finishing, it writes back the result to the blockchain.",
-  "main": "index.js",
-  "scripts": {
-    "test": "test"
-  },
+  "version": "0.0.4",
+  "description": "This node script represents a monitor of the service marketplace. It is part of the Cloud Prototyping Project at TU Berlin (ISE)",
   "bin": {
     "cp2017-service-monitor": "./index.js"
   },
